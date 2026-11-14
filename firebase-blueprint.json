@@ -1,0 +1,349 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Profil utilisateur privé (client, vendeur ou administrateur).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fullName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "city": { "type": "string", "maxLength": 60 },
+        "photoURL": { "type": "string", "maxLength": 1000 },
+        "roles": { "type": "array", "description": "Rôles autorisés (client, vendor)." },
+        "suspended": { "type": "boolean" },
+        "followedStoreIds": { "type": "array", "description": "Liste des identifiants de boutiques suivies." },
+        "cart": { "type": "array", "description": "Panier persistant synchronisé de l'utilisateur." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "fullName", "email", "roles", "suspended", "createdAt", "updatedAt"]
+    },
+    "Store": {
+      "title": "Store",
+      "description": "Boutique publique d'un vendeur sur TECH STYLE MARKET.",
+      "type": "object",
+      "properties": {
+        "storeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 1500 },
+        "logo": { "type": "string", "maxLength": 1000 },
+        "coverImage": { "type": "string", "maxLength": 1000 },
+        "whatsapp": { "type": "string", "maxLength": 30 },
+        "contactInfo": { "type": "string", "maxLength": 250 },
+        "city": { "type": "string", "maxLength": 60 },
+        "slug": { "type": "string", "minLength": 3, "maxLength": 80, "pattern": "^[a-z0-9\\-]+$" },
+        "categories": { "type": "array", "description": "Catégories principales vendues par la boutique." },
+        "acceptedVendorTerms": { "type": "boolean" },
+        "verificationStatus": { "type": "string", "enum": ["unverified", "pending", "verified", "suspended"] },
+        "certificationRequested": { "type": "boolean" },
+        "deliveryFee": { "type": "number", "description": "Frais de livraison en FCFA (0 si non défini)." },
+        "visitorCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["storeId", "ownerId", "name", "slug", "city", "verificationStatus", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Produit publié par une boutique vendeur.",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "reference": { "type": "string", "minLength": 4, "maxLength": 30 },
+        "sellerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 3, "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "price": { "type": "number" },
+        "promoPrice": { "type": "number" },
+        "category": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "images": { "type": "array", "description": "URLs HTTPS Cloudinary ordonnées des photos du produit (max 8)." },
+        "productImages": { "type": "array", "description": "Métadonnées complètes des photos Cloudinary (url, publicId, fileId, fileName, ownerId, isPrimary, order, uploadedAt)." },
+        "stock": { "type": "number" },
+        "status": { "type": "string", "enum": ["disponible", "rupture", "brouillon", "masque"] },
+        "city": { "type": "string", "maxLength": 60 },
+        "condition": { "type": "string", "maxLength": 60 },
+        "additionalInfo": { "type": "string", "maxLength": 1500 },
+        "salesCount": { "type": "number" },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["productId", "reference", "sellerId", "storeId", "name", "price", "category", "images", "stock", "status", "createdAt", "updatedAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Sous-commande vendeur rattachée à une référence globale de commande.",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orderNumber": { "type": "string", "maxLength": 40 },
+        "globalOrderNumber": { "type": "string", "maxLength": 40 },
+        "customerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "sellerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeName": { "type": "string", "maxLength": 100 },
+        "items": { "type": "array" },
+        "customerName": { "type": "string", "maxLength": 100 },
+        "deliveryAddress": { "type": "string", "maxLength": 350 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "city": { "type": "string", "maxLength": 60 },
+        "itemsSubtotal": { "type": "number" },
+        "deliveryFee": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["paiement_a_la_livraison"] },
+        "orderStatus": { "type": "string", "enum": ["en_attente", "confirmee", "en_preparation", "expediee", "livree", "annulee"] },
+        "idempotencyKey": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["orderId", "orderNumber", "globalOrderNumber", "customerId", "sellerId", "storeId", "items", "deliveryAddress", "phone", "totalAmount", "paymentMethod", "orderStatus", "createdAt"]
+    },
+    "Favorite": {
+      "title": "Favorite",
+      "description": "Produit mis en favori par un utilisateur.",
+      "type": "object",
+      "properties": {
+        "favoriteId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["favoriteId", "userId", "productId", "createdAt"]
+    },
+    "Live": {
+      "title": "Live",
+      "description": "Session Live Shopping YouTube Live d'une boutique.",
+      "type": "object",
+      "properties": {
+        "liveId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "slug": { "type": "string", "minLength": 3, "maxLength": 100, "pattern": "^[a-z0-9\\-]+$" },
+        "sellerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeName": { "type": "string", "maxLength": 100 },
+        "storeSlug": { "type": "string", "maxLength": 80 },
+        "title": { "type": "string", "minLength": 3, "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "category": { "type": "string", "maxLength": 80 },
+        "coverImage": { "type": "string", "maxLength": 1000 },
+        "streamProvider": { "type": "string", "enum": ["youtube", "camera", "external_url"] },
+        "streamUrl": { "type": "string", "maxLength": 600 },
+        "youtubeUrl": { "type": "string", "maxLength": 600 },
+        "youtubeVideoId": { "type": "string", "maxLength": 20 },
+        "embedUrl": { "type": "string", "maxLength": 600 },
+        "status": { "type": "string", "enum": ["programme", "en_preparation", "en_direct", "termine", "annule"] },
+        "scheduledAt": { "type": "string", "format": "date-time" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "endedAt": { "type": "string", "format": "date-time" },
+        "productIds": { "type": "array" },
+        "featuredProductId": { "type": "string", "maxLength": 128 },
+        "moderatedHidden": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["liveId", "slug", "sellerId", "storeId", "title", "streamProvider", "status", "scheduledAt", "createdAt"]
+    },
+    "LiveComment": {
+      "title": "LiveComment",
+      "description": "Commentaire, question ou réaction en direct dans une session Live Shopping.",
+      "type": "object",
+      "properties": {
+        "commentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "liveId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userName": { "type": "string", "maxLength": 100 },
+        "userAvatar": { "type": "string", "maxLength": 1000 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "isQuestion": { "type": "boolean" },
+        "reactionType": { "type": "string", "enum": ["comment", "question", "reaction"] },
+        "hidden": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["commentId", "liveId", "userId", "userName", "text", "isQuestion", "createdAt"]
+    },
+    "StoreFollower": {
+      "title": "StoreFollower",
+      "description": "Relation d'abonnement sans PII permettant d'avertir les abonnés d'un nouveau live.",
+      "type": "object",
+      "properties": {
+        "followId": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeOwnerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["followId", "userId", "storeId", "storeOwnerId", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Fil de discussion entre un client et un vendeur.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participants": { "type": "array" },
+        "clientId": { "type": "string", "maxLength": 128 },
+        "clientName": { "type": "string", "maxLength": 100 },
+        "sellerId": { "type": "string", "maxLength": 128 },
+        "storeId": { "type": "string", "maxLength": 128 },
+        "storeName": { "type": "string", "maxLength": 100 },
+        "lastMessage": { "type": "string", "maxLength": 1000 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["conversationId", "participants", "lastMessage", "updatedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Message individuel dans une conversation.",
+      "type": "object",
+      "properties": {
+        "messageId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conversationId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participants": { "type": "array" },
+        "senderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 1200 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["messageId", "conversationId", "participants", "senderId", "text", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Notification destinée à un utilisateur.",
+      "type": "object",
+      "properties": {
+        "notificationId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "maxLength": 50 },
+        "title": { "type": "string", "maxLength": 150 },
+        "message": { "type": "string", "maxLength": 500 },
+        "link": { "type": "string", "maxLength": 300 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["notificationId", "userId", "type", "title", "message", "read", "createdAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Avis client sur un produit et sa boutique.",
+      "type": "object",
+      "properties": {
+        "reviewId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "storeId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "userName": { "type": "string", "maxLength": 100 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "minLength": 2, "maxLength": 1000 },
+        "vendorReply": { "type": "string", "maxLength": 800 },
+        "hidden": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reviewId", "productId", "storeId", "userId", "userName", "rating", "comment", "createdAt"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Signalement envoyé à la modération.",
+      "type": "object",
+      "properties": {
+        "reportId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "reporterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "reporterName": { "type": "string", "maxLength": 100 },
+        "targetType": { "type": "string", "enum": ["product", "shop", "review", "live", "live_comment"] },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "targetLabel": { "type": "string", "maxLength": 150 },
+        "reason": { "type": "string", "minLength": 5, "maxLength": 800 },
+        "status": { "type": "string", "enum": ["ouvert", "resolu", "rejete"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reportId", "reporterId", "targetType", "targetId", "reason", "status", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Catégorie officielle du catalogue.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "name": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "slug": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 300 }
+      },
+      "required": ["id", "name", "slug"]
+    },
+    "OrderLock": {
+      "title": "OrderLock",
+      "description": "Verrou d'idempotence empêchant les commandes en double.",
+      "type": "object",
+      "properties": {
+        "lockId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "customerId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "globalOrderNumber": { "type": "string", "maxLength": 40 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["lockId", "customerId", "globalOrderNumber", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Profils utilisateurs privés isolés par UID."
+    },
+    "/stores/{storeId}": {
+      "schema": { "$ref": "#/entities/Store" },
+      "description": "Boutiques publiques des vendeurs."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Catalogue des produits publiés par les boutiques."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Sous-commandes par vendeur rattachées à une commande globale."
+    },
+    "/orderLocks/{lockId}": {
+      "schema": { "$ref": "#/entities/OrderLock" },
+      "description": "Clés d'idempotence anti-doublon pour les commandes."
+    },
+    "/favorites/{favoriteId}": {
+      "schema": { "$ref": "#/entities/Favorite" },
+      "description": "Produits favoris par utilisateur."
+    },
+    "/lives/{liveId}": {
+      "schema": { "$ref": "#/entities/Live" },
+      "description": "Sessions Live Shopping programmées ou en direct."
+    },
+    "/lives/{liveId}/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/LiveComment" },
+      "description": "Commentaires et questions en direct sur un Live."
+    },
+    "/storeFollowers/{followId}": {
+      "schema": { "$ref": "#/entities/StoreFollower" },
+      "description": "Index sans PII des abonnés d'une boutique pour notifications de lives."
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "Conversations privées entre client et vendeur."
+    },
+    "/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Messages des conversations privées."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Notifications personnelles des utilisateurs."
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Avis et notes clients sur les produits."
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "Signalements soumis à l'administration."
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Catégories du catalogue gérées par l'administration."
+    }
+  }
+}

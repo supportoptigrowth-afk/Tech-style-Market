@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidImageUpload() {
+      return request.resource != null &&
+        request.resource.size <= 5 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/(jpeg|jpg|png|webp)');
+    }
+
+    // Photos de profil utilisateur : lecture publique, écriture uniquement par le propriétaire
+    match /users/{userId}/avatar/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId && isValidImageUpload();
+      allow delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Logos et couvertures des boutiques : lecture publique, écriture uniquement par le propriétaire
+    match /stores/{ownerId}/{storeId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == ownerId && isValidImageUpload();
+      allow delete: if isSignedIn() && request.auth.uid == ownerId;
+    }
+
+    // Photos des produits : lecture publique, écriture uniquement par le vendeur propriétaire
+    match /products/{ownerId}/{productId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == ownerId && isValidImageUpload();
+      allow delete: if isSignedIn() && request.auth.uid == ownerId;
+    }
+
+    // Images de couverture Live Shopping : lecture publique, écriture uniquement par le vendeur
+    match /lives/{ownerId}/{liveId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == ownerId && isValidImageUpload();
+      allow delete: if isSignedIn() && request.auth.uid == ownerId;
+    }
+
+    // Verrouillage par défaut
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

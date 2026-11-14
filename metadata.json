@@ -1,0 +1,6 @@
+{
+  "name": "TECH STYLE MARKET",
+  "description": "Marketplace multi-vendeurs professionnelle au Niger — Achat direct, commande WhatsApp et Live Shopping en FCFA (XOF).",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": []
+}
